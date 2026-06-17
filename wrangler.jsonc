@@ -27,6 +27,6 @@
 		"AUTH_COOKIE_SECURE": "false",
 		"AUTH_COOKIE_DOMAIN": "",
 		"RESEND_API_KEY": "re_placeholder",
-		"FRONTEND_URL": "http://localhost:3000"
+		"FRONTEND_URL": "http://localhost:5173"
 	},
 }
