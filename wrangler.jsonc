@@ -31,6 +31,6 @@
 		"AUTH_COOKIE_SAMESITE": "Lax",
 		"AUTH_COOKIE_SECURE": "true",
 		"AUTH_COOKIE_DOMAIN": "",
-		"FRONTEND_URL": "https://budgeting-fe-1s8.pages.dev/"
+		"FRONTEND_URL": "https://budgeting-fe-1s8.pages.dev"
 	},
 }
