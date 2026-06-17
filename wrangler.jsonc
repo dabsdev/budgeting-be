@@ -2,7 +2,9 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "budgeting-be",
 	"triggers": {
-		"crons": ["0 3 * * *"]
+		"crons": [
+			"0 3 * * *"
+		]
 	},
 	"main": "src/app.ts",
 	"compatibility_date": "2026-06-16",
@@ -27,9 +29,8 @@
 		"ACCESS_TOKEN_TTL": 60,
 		"REFRESH_TOKEN_COOKIE": "budgeting-refresh",
 		"AUTH_COOKIE_SAMESITE": "Lax",
-		"AUTH_COOKIE_SECURE": "false",
+		"AUTH_COOKIE_SECURE": "true",
 		"AUTH_COOKIE_DOMAIN": "",
-		"RESEND_API_KEY": "re_placeholder",
-		"FRONTEND_URL": "http://localhost:5173"
+		"FRONTEND_URL": "https://budgeting-fe-1s8.pages.dev/"
 	},
 }
