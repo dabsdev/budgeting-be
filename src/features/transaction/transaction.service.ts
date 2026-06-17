@@ -60,7 +60,7 @@ export const createTransaction = async (db: DrizzleD1, user_id: string, data: Tr
 export const getAllTransactions = async (
     db: DrizzleD1,
     user_id: string,
-    options: { page?: number; limit?: number; wallet_id?: string; budget_id?: string; type?: "IN" | "OUT"; search?: string }
+    options: { page?: number; limit?: number; wallet_id?: string; type?: "IN" | "OUT"; search?: string }
 ) => {
     let whereClause = and(
         eq(transactions.user_id, user_id),
@@ -69,9 +69,6 @@ export const getAllTransactions = async (
 
     if (options.wallet_id) {
         whereClause = and(whereClause, eq(transactions.wallet_id, options.wallet_id));
-    }
-    if (options.budget_id) {
-        whereClause = and(whereClause, eq(transactions.budget_id, options.budget_id));
     }
     if (options.type) {
         whereClause = and(whereClause, eq(transactions.type, options.type));

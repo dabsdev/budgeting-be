@@ -30,14 +30,13 @@ export const transactionRoutes = new Hono<AppEnv>()
         return c.api.success(result, "Success create new transfer.", 201);
     })
     .get("/transactions", async (c) => {
-        const { page, limit, wallet_id, budget_id, type, search } = c.req.query();
+        const { page, limit, wallet_id, type, search } = c.req.query();
         const { id } = c.get("user");
 
         const { data, pagination } = await getAllTransactions(db(c.env.DB), id, {
             page: page ? Number(page) : undefined,
             limit: limit ? Number(limit) : undefined,
             wallet_id,
-            budget_id,
             type: type as "IN" | "OUT" | undefined,
             search
         });
