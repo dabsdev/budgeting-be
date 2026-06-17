@@ -18,7 +18,8 @@ export const transactions = sqliteTable("transactions", {
         .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
     updated_at: text("updated_at"),
     deleted_at: text("deleted_at"),
-    linked_transaction_id: text("linked_transaction_id")
+    linked_transaction_id: text("linked_transaction_id"),
+    linked_reminder_id: text("linked_reminder_id")
 }, (table) => {
     return {
         idxTransactionIsDeleted: index("idx_transaction_is_deleted").on(table.is_deleted),
@@ -27,6 +28,7 @@ export const transactions = sqliteTable("transactions", {
         idxTransactionBudgetId: index("idx_transaction_budget_id").on(table.budget_id),
         idxTransactionDate: index("idx_transaction_date").on(table.transaction_date),
         idxTransactionLinkedId: index("idx_transaction_linked_id").on(table.linked_transaction_id),
+        idxTransactionLinkedReminderId: index("idx_transaction_linked_reminder_id").on(table.linked_reminder_id),
         idxTransactionUserIsDeletedDate: index("idx_transaction_user_is_deleted_date").on(table.user_id, table.is_deleted, table.transaction_date)
     }
 });

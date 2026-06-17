@@ -6,6 +6,7 @@ export const recurringReminders = sqliteTable("recurring_reminders", {
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
     user_id: text("user_id").notNull(),
+    wallet_id: text("wallet_id"),
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
     day_of_month: integer("day_of_month").notNull(),
@@ -21,6 +22,7 @@ export const recurringReminders = sqliteTable("recurring_reminders", {
         idxRecurringRemindersIsDeleted: index("idx_recurring_reminders_is_deleted").on(table.is_deleted),
         idxRecurringRemindersIsActive: index("idx_recurring_reminders_is_active").on(table.is_active),
         idxRecurringRemindersUserId: index("idx_recurring_reminders_user_id").on(table.user_id),
+        idxRecurringRemindersWalletId: index("idx_recurring_reminders_wallet_id").on(table.wallet_id),
         idxRecurringRemindersDescription: index("idx_recurring_reminders_description").on(sql`${table.description} COLLATE NOCASE`),
     }
 });

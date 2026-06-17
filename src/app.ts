@@ -5,6 +5,7 @@ import { apiOnError } from "./middleware/api/api.onError";
 import { apiNotFound } from "./middleware/api/api.notFound";
 import { router } from "./router";
 import { cors } from "hono/cors";
+import { processRecurringReminders } from "./features/recurring-reminder/cron.service";
 
 const app = new Hono<AppEnv>()
 	.use("*", cors({
@@ -30,4 +31,7 @@ export default {
 
 		return dynamicApp.fetch(request, env, ctx);
 	},
+	async scheduled(event: any, env: Bindings, ctx: ExecutionContext) {
+		ctx.waitUntil(processRecurringReminders(env));
+	}
 };

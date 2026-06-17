@@ -1,6 +1,9 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "budgeting-be",
+	"triggers": {
+		"crons": ["0 3 * * *"]
+	},
 	"main": "src/app.ts",
 	"compatibility_date": "2026-06-16",
 	"observability": {
