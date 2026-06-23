@@ -91,6 +91,20 @@ describe("Budget Filter Unit Tests", () => {
         expect(ids).toEqual(["b1", "b2", "b3", "b4"]);
     });
 
+    it("should return budgets sorted by category asc by default", async () => {
+        const { data } = await getAllBudgets(db, "user1", {});
+        expect(data).toHaveLength(4);
+        const categories = data.map((b: any) => b.category);
+        expect(categories).toEqual(["Entertainment", "Food", "Rent", "Utilities"]);
+    });
+
+    it("should return budgets sorted by category desc when requested", async () => {
+        const { data } = await getAllBudgets(db, "user1", { sort_by: "category", sort_order: "desc" });
+        expect(data).toHaveLength(4);
+        const categories = data.map((b: any) => b.category);
+        expect(categories).toEqual(["Utilities", "Rent", "Food", "Entertainment"]);
+    });
+
     it("should filter by month_year exactly", async () => {
         const { data } = await getAllBudgets(db, "user1", { month_year: "2026-06" });
         expect(data).toHaveLength(2);

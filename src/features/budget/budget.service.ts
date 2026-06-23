@@ -18,7 +18,7 @@ export const createBudget = async (db: DrizzleD1, user_id: string, data: BudgetI
 export const getAllBudgets = async (
     db: DrizzleD1,
     user_id: string,
-    options: { page?: number; limit?: number; month_year?: string; }
+    options: { page?: number; limit?: number; month_year?: string; sort_by?: string; sort_order?: "asc" | "desc"; }
 ) => {
     const monthYear = options.month_year || new Date().toISOString().substring(0, 7);
 
@@ -79,7 +79,12 @@ export const getAllBudgets = async (
         db,
         budgets,
         whereClause,
-        { page: options.page, limit: options.limit },
+        {
+            page: options.page,
+            limit: options.limit,
+            sortColumn: options.sort_by || "category",
+            sortOrder: options.sort_order || "asc"
+        },
         async (currentIds) => {
             return await db
                 .select({

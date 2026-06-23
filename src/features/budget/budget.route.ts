@@ -18,17 +18,23 @@ export const budgetRoutes = new Hono<AppEnv>()
         return c.api.success(result, "Success create new budget.", 201)
     })
     .get("/budgets", async (c) => {
-        const { page, limit, month_year } = c.req.query()
+        const { page, limit, month_year, sort_by, sort_order } = c.req.query()
         const { id } = c.get("user")
 
         if (month_year && !/^\d{4}-\d{2}$/.test(month_year)) {
             return c.api.error("Invalid month year format. Use YYYY-MM.", 400);
         }
 
+        if (sort_order && sort_order !== "asc" && sort_order !== "desc") {
+            return c.api.error("Invalid sort_order. Must be 'asc' or 'desc'.", 400);
+        }
+
         const { data, summary, pagination } = await getAllBudgets(db(c.env.DB), id, {
             page: page ? Number(page) : undefined,
             limit: limit ? Number(limit) : undefined,
-            month_year
+            month_year,
+            sort_by,
+            sort_order: sort_order as "asc" | "desc" | undefined
         })
 
         return c.api.success(data, "Success get all budgets.", 200, pagination, { summary })

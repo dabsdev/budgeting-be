@@ -1,6 +1,6 @@
 import { type SQLiteTable, type AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 import { DrizzleD1 } from "../config/db"
-import { sql, SQL } from "drizzle-orm";
+import { sql, SQL, asc, desc } from "drizzle-orm";
 
 export const insertRecord = async <TTable extends SQLiteTable>(
     db: DrizzleD1,
@@ -67,7 +67,7 @@ export const findManyWithIdPagination = async <
     options: PaginationOptions,
     fetchDataCallback: TCallback
 ) => {
-    const { page = 1, limit = 10, idKey = "id" } = options;
+    const { page = 1, limit = 10, idKey = "id", sortColumn, sortOrder = "asc" } = options;
     const offset = (page - 1) * limit;
     const fetchLimit = limit + 1;
 
@@ -85,12 +85,19 @@ export const findManyWithIdPagination = async <
 
     // 1. QUERY AMBIL ID TERPAGINASI SEBAGAI SUBQUERY
     const idColumn = table[idKey as keyof typeof table] as AnySQLiteColumn;
-    const pageIdsSubquery = db
+    let pageIdsQuery = db
         .select({ id: idColumn })
         .from(table)
-        .where(where)
-        .limit(fetchLimit)
-        .offset(offset);
+        .where(where);
+
+    if (sortColumn && sortColumn in table) {
+        const orderColumn = table[sortColumn as keyof typeof table] as AnySQLiteColumn;
+        pageIdsQuery = pageIdsQuery.orderBy(
+            sortOrder === "desc" ? desc(orderColumn) : asc(orderColumn)
+        );
+    }
+
+    const pageIdsSubquery = pageIdsQuery.limit(fetchLimit).offset(offset);
 
     // 2. PANGGIL CALLBACK LANGSUNG DENGAN SUBQUERY
     // Ini akan dieksekusi sebagai single SQL query di SQLite (1 RPC)
@@ -114,11 +121,47 @@ export const findManyWithIdPagination = async <
         slicedData = rawData.filter((row: any) => allowedIds.has(getIdFromRow(row)));
     }
 
-    // Urutkan data hasil JOIN di memori agar konsisten dengan urutan ID Paginasi
+    // Urutkan data hasil JOIN di memori agar konsisten dengan urutan ID Paginasi atau sortColumn
     if (slicedData.length > 0) {
-        slicedData.sort((a: any, b: any) => {
-            return uniqueIds.indexOf(getIdFromRow(a)) - uniqueIds.indexOf(getIdFromRow(b));
-        });
+        if (sortColumn) {
+            slicedData.sort((a: any, b: any) => {
+                let valA = a[sortColumn];
+                let valB = b[sortColumn];
+
+                // Jika object hasil join (bentuknya { products: {...}, categories: {...} })
+                if (valA === undefined || valB === undefined) {
+                    for (const key of Object.keys(a)) {
+                        if (a[key] && typeof a[key] === "object" && sortColumn in a[key]) {
+                            valA = a[key][sortColumn];
+                            break;
+                        }
+                    }
+                    for (const key of Object.keys(b)) {
+                        if (b[key] && typeof b[key] === "object" && sortColumn in b[key]) {
+                            valB = b[key][sortColumn];
+                            break;
+                        }
+                    }
+                }
+
+                if (valA === undefined) valA = "";
+                if (valB === undefined) valB = "";
+
+                if (typeof valA === "string" && typeof valB === "string") {
+                    return sortOrder === "desc"
+                        ? valB.localeCompare(valA)
+                        : valA.localeCompare(valB);
+                }
+
+                return sortOrder === "desc"
+                    ? (valA < valB ? 1 : valA > valB ? -1 : 0)
+                    : (valA > valB ? 1 : valA < valB ? -1 : 0);
+            });
+        } else {
+            slicedData.sort((a: any, b: any) => {
+                return uniqueIds.indexOf(getIdFromRow(a)) - uniqueIds.indexOf(getIdFromRow(b));
+            });
+        }
     }
 
     return {
