@@ -10,7 +10,7 @@ import { processRecurringReminders } from "./features/recurring-reminder/recurri
 const app = new Hono<AppEnv>()
 	.use("*", cors({
 		origin: (origin, c) => {
-			const allowedOrigins = [c.env.FRONTEND_URL, "http://localhost:5173", "http://localhost:3000"];
+			const allowedOrigins = [c.env.FRONTEND_URL, "http://localhost:5173", "http://localhost:3000", "https://budgeting.heydapps.com/"];
 			return allowedOrigins.includes(origin) ? origin : c.env.FRONTEND_URL;
 		},
 		credentials: true,
