@@ -225,4 +225,36 @@ describe("Budget Filter Unit Tests", () => {
         expect(budgetB3.spent).toBe(400);
         expect(budgetB3.remaining).toBe(100);
     });
+
+    it("should exclude transfers (transactions with linked_transaction_id) from total_income", async () => {
+        // 1. Insert a normal IN transaction (Income) for user1 in 2026-06
+        await db.insert(transactions).values({
+            id: "t-inc-normal",
+            user_id: "user1",
+            wallet_id: "w1",
+            type: "IN",
+            description: "Salary",
+            amount: 10000,
+            transaction_date: "2026-06-01",
+            is_deleted: false
+        });
+
+        // 2. Insert a transfer IN transaction (with linked_transaction_id)
+        await db.insert(transactions).values({
+            id: "t-inc-transfer",
+            user_id: "user1",
+            wallet_id: "w1",
+            type: "IN",
+            description: "Transfer from Wallet B",
+            amount: 5000,
+            transaction_date: "2026-06-02",
+            is_deleted: false,
+            linked_transaction_id: "t-out-transfer"
+        });
+
+        // 3. Fetch budgets and verify total_income is only the normal transaction amount (10000)
+        const { summary } = await getAllBudgets(db, "user1", { month_year: "2026-06" });
+
+        expect(summary.total_income).toBe(10000);
+    });
 });

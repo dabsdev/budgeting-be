@@ -3,7 +3,7 @@ import { DrizzleD1 } from "../../config/db";
 import { deleteRecord, findManyWithIdPagination, insertRecord, updateRecord } from "../../lib/drizzle.d1";
 import { BudgetInputType } from "./budget.schema";
 import { budgets } from "./budget.table";
-import { and, eq, gte, inArray, like, lte, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, like, lte, sql } from "drizzle-orm";
 import { transactions } from "../transaction/transaction.table";
 import { users } from "../user/user.table";
 import { getCycleDateRange } from "../../lib/date";
@@ -43,6 +43,7 @@ export const getAllBudgets = async (
                 eq(transactions.user_id, user_id),
                 eq(transactions.is_deleted, false),
                 eq(transactions.type, "IN"),
+                isNull(transactions.linked_transaction_id),
                 gte(transactions.transaction_date, startDate),
                 lte(transactions.transaction_date, endDate)
             )
